@@ -7,6 +7,7 @@ import Machines from './pages/Machines';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import SalesOrders from './pages/SalesOrders';
 import BillOfMaterials from './pages/BillOfMaterials';
+import ProductionPriority from './pages/ProductionPriority';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,10 +23,9 @@ function App() {
             <Button color="inherit" component={Link} to="/">Dashboard</Button>
             <Button color="inherit" component={Link} to="/sales-orders">Sales Orders</Button>
             <Button color="inherit" component={Link} to="/schedules">Backward Schedule</Button>
+            <Button color="inherit" component={Link} to="/production-priority">Production Priority</Button>
             <Button color="inherit" component={Link} to="/machines">Machines</Button>
             <Button color="inherit" component={Link} to="/bom">BOM</Button>
-           
-            {/* <Button color="inherit" component={Link} to="/reports">Reports</Button> */}
           </Box>
         </Toolbar>
       </AppBar>
@@ -35,7 +35,7 @@ function App() {
         <Route path="/machines" element={<Machines />} />
         <Route path="/sales-orders" element={<SalesOrders />} />
         <Route path="/bom" element={<BillOfMaterials />} />
-        <Route path="/schedules" element={<Schedules />} />
+        <Route path="/production-priority" element={<ProductionPriority />} />
         <Route path="/" element={
           <Container maxWidth={false} sx={{ mt: 10, px: '20%' }}>
             <Paper elevation={3} sx={{ p: 4, mb:2, width:'94%', background:'rgba(255, 255, 255, 0.2);' }}>
@@ -53,11 +53,14 @@ function App() {
                 <Button variant="contained" color="secondary" size="large" component={Link} to="/schedules">
                   Manage Schedule
                 </Button>
-                <Button variant="contained" color="secondary" size="large" component={Link} to="/sales-order">
+                <Button variant="contained" color="secondary" size="large" component={Link} to="/sales-orders">
                   Manage Orders
                 </Button>
-                <Button variant="contained" color="secondary" size="large" component={Link} to="/sales-order">
+                <Button variant="contained" color="secondary" size="large" component={Link} to="/bom">
                   Manage BOM
+                </Button>
+                <Button variant="contained" color="secondary" size="large" component={Link} to="/production-priority">
+                  Production Priority
                 </Button>
               </Box>
             </Paper>
