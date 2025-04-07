@@ -36,15 +36,54 @@ const Schedules = () => {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [metrics, setMetrics] = useState({
+      totalOrders: 0,
+      idleCapacity: '0%',
+      ordersAtRisk: 0,
+      pendingApprovals: 0
+    });
+  
   useEffect(() => {
     fetchSchedules();
   }, []);
-
+  
   const fetchSchedules = async () => {
     try {
       const response = await fetch('https://kera-internship.onrender.com/schedule');
       const data = await response.json();
       setSchedules(data);
+      
+      // Calculate metrics from schedule data
+      const totalOrders = data.length;
+      
+      // Calculate orders at risk (orders ending within 24 hours)
+      const now = new Date();
+      const ordersAtRisk = data.filter(schedule => {
+        const endTime = new Date(schedule.end_time);
+        const timeLeft = endTime - now;
+        return timeLeft <= 24 * 60 * 60 * 1000 && timeLeft > 0;
+      }).length;
+  
+      // Calculate pending approvals (schedules with pending status)
+      const pendingApprovals = data.filter(schedule => 
+        schedule.status === 'pending' || schedule.status === 'Pending'
+      ).length;
+  
+      // Calculate idle capacity
+      const totalMachines = new Set(data.map(s => s.machineId)).size;
+      const activeMachines = new Set(data.filter(s => 
+        new Date(s.end_time) > now
+      ).map(s => s.machineId)).size;
+      const idleCapacity = totalMachines ? 
+        Math.round(((totalMachines - activeMachines) / totalMachines) * 100) : 0;
+  
+      setMetrics({
+        totalOrders,
+        idleCapacity: `${idleCapacity}%`,
+        ordersAtRisk,
+        pendingApprovals
+      });
+      
       setLoading(false);
     } catch (error) {
       console.error('Error fetching schedules:', error);
@@ -52,12 +91,12 @@ const Schedules = () => {
     }
   };
 
-  // Mock data for demonstration
-  const metrics = [
-    { title: 'Total Orders', value: '45' },
-    { title: 'Idle Capacity', value: '15%' },
-    { title: 'Orders at Risk', value: '3' },
-    { title: 'Pending Approvals', value: '5' },
+  // Update the metrics rendering
+  const metricsData = [
+    { title: 'Total Orders', value: metrics.totalOrders },
+    { title: 'Idle Capacity', value: metrics.idleCapacity },
+    { title: 'Orders at Risk', value: metrics.ordersAtRisk },
+    { title: 'Pending Approvals', value: metrics.pendingApprovals },
   ];
 
   const orders = [
@@ -118,7 +157,7 @@ const Schedules = () => {
 
         {/* Metrics */}
         <Grid container spacing={3} sx={{ mb: 3 }}>
-          {metrics.map((metric) => (
+          {metricsData.map((metric) => (
             <Grid item xs={12} sm={6} md={3} key={metric.title}>
               <Card>
                 <CardContent>

@@ -35,7 +35,7 @@ const SchedulerUI = ({ suggestionsData }) => {
           <TableHead>
             <TableRow>
               <TableCell>Operation</TableCell>
-              <TableCell>Order No</TableCell>
+              {/* <TableCell>Order No</TableCell> */}
               <TableCell>Machine ID</TableCell>
               <TableCell>Reason</TableCell>
               <TableCell>Suggestion</TableCell>
@@ -47,7 +47,7 @@ const SchedulerUI = ({ suggestionsData }) => {
               pendingSuggestions.map((suggestion, index) => (
                 <TableRow key={index}>
                   <TableCell>{suggestion.operation || '-'}</TableCell>
-                  <TableCell>{suggestion.orderNo || '-'}</TableCell>
+                  {/* l */}
                   <TableCell>{suggestion.machineId || '-'}</TableCell>
                   <TableCell>{suggestion.reason || '-'}</TableCell>
                   <TableCell>{suggestion.suggestion || '-'}</TableCell>
