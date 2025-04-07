@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -33,6 +33,24 @@ import {
 const Schedules = () => {
   const [viewMode, setViewMode] = useState('table');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
+
+  const fetchSchedules = async () => {
+    try {
+      const response = await fetch('https://kera-internship.onrender.com/schedule');
+      const data = await response.json();
+      setSchedules(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      setLoading(false);
+    }
+  };
 
   // Mock data for demonstration
   const metrics = [
@@ -60,11 +78,12 @@ const Schedules = () => {
     <Box sx={{ 
       flexGrow: 1, 
       height: 'auto', 
-      overflow: 'hidden', 
+      overflow: 'hidden',
       pt: 2,
       pb: 5,
-      bgcolor: 'rgba(255,255,255,0.95)', // Add this line to set white background
-      width:'90%', margin:'5% auto'
+      bgcolor: 'rgba(255,255,255,0.95)',
+      width:'90%', 
+      margin:'5% auto'
     }}>
       <Container maxWidth={false} sx={{ px: 3 }}>
         {/* Header */}
@@ -79,16 +98,8 @@ const Schedules = () => {
 
         {/* Controls */}
         <Grid container spacing={3} sx={{ mb: 3, pt: 5, width: '100%', mx: 0 }}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Date Range"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
+          
+          <Grid item xs={12} md={12}>
             <TextField
               fullWidth
               variant="outlined"
@@ -102,21 +113,7 @@ const Schedules = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={2}>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={(e, newValue) => setViewMode(newValue)}
-              fullWidth
-            >
-              <ToggleButton value="table">
-                <ListIcon />
-              </ToggleButton>
-              <ToggleButton value="gantt">
-                <CalendarIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
+          
         </Grid>
 
         {/* Metrics */}
@@ -141,48 +138,42 @@ const Schedules = () => {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>Product</TableCell>
-                  <TableCell>Machine</TableCell>
-                  <TableCell>Start</TableCell>
-                  <TableCell>End</TableCell>
+                  <TableCell>Machine ID</TableCell>
+                  <TableCell>Process</TableCell>
+                  <TableCell>Start Time</TableCell>
+                  <TableCell>End Time</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Tag</TableCell>
-                  <TableCell>Suggestions</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {orders.map((order) => (
-                  <TableRow
-                    key={order.id}
-                    sx={{
-                      backgroundColor: order.tag === 'NC' ? '#fff3e0' : 'inherit',
-                    }}
-                  >
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.product}</TableCell>
-                    <TableCell>{order.machine}</TableCell>
-                    <TableCell>{order.start}</TableCell>
-                    <TableCell>{order.end}</TableCell>
-                    <TableCell>{order.status}</TableCell>
-                    <TableCell>{order.tag}</TableCell>
-                    <TableCell>{order.suggestions}</TableCell>
-                    <TableCell>
-                      <IconButton size="small" color="primary">
-                        <CheckCircleIcon />
-                      </IconButton>
-                      <IconButton size="small" color="error">
-                        <CancelIcon />
-                      </IconButton>
-                      {order.tag === 'NC' && (
-                        <IconButton size="small" disabled>
-                          <LockIcon />
-                        </IconButton>
-                      )}
-                    </TableCell>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">Loading...</TableCell>
                   </TableRow>
-                ))}
+                ) : schedules.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">No schedules found</TableCell>
+                  </TableRow>
+                ) : (
+                  schedules.map((schedule) => (
+                    <TableRow key={schedule._id}>
+                      <TableCell>{schedule.machineId}</TableCell>
+                      <TableCell>{schedule.process}</TableCell>
+                      <TableCell>{new Date(schedule.start_time).toLocaleString()}</TableCell>
+                      <TableCell>{new Date(schedule.end_time).toLocaleString()}</TableCell>
+                      <TableCell>{schedule.status}</TableCell>
+                      <TableCell>
+                        <IconButton size="small" color="primary">
+                          <CheckCircleIcon />
+                        </IconButton>
+                        <IconButton size="small" color="error">
+                          <CancelIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -190,8 +181,8 @@ const Schedules = () => {
 
         {/* Footer Actions */}
         <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button variant="outlined">Export Schedule</Button>
-          <Button variant="outlined">Sync with ERP</Button>
+          {/* <Button variant="outlined">Export Schedule</Button>
+          <Button variant="outlined">Sync with ERP</Button> */}
         </Box>
 
         {/* Suggestion Drawer */}

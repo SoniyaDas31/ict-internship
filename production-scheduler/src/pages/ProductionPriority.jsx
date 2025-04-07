@@ -42,12 +42,75 @@ import {
 
 const ProductionPriority = () => {
   const [scheduleData, setScheduleData] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [machines, setMachines] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [selectedRecommendation, setSelectedRecommendation] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [optimizationRun, setOptimizationRun] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  // Remove the mock data useEffect completely (the one with mockScheduleData)
+  
+  // Update the fetchAllData function to log the data
+  const fetchAllData = async () => {
+    try {
+      const [ordersRes, schedulesRes, machinesRes] = await Promise.all([
+        fetch('https://kera-internship.onrender.com/order'),
+        fetch('https://kera-internship.onrender.com/schedule'),
+        fetch('https://kera-internship.onrender.com/machine')
+      ]);
+  
+      const [ordersData, schedulesData, machinesData] = await Promise.all([
+        ordersRes.json(),
+        schedulesRes.json(),
+        machinesRes.json()
+      ]);
+  
+      console.log('Orders:', ordersData);
+      console.log('Schedules:', schedulesData);
+      console.log('Machines:', machinesData);
+  
+      setOrders(ordersData);
+      setScheduleData(schedulesData);
+      setMachines(machinesData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    }
+  };
+  
+  // Update the table mapping
+  scheduleData.map((schedule) => {
+    const order = orders.find(o => o.orderId === schedule.orderId);
+    const machine = machines.find(m => m.machineId === schedule.machineId);
+    return (
+      <TableRow key={schedule._id}>
+        <TableCell>{schedule.orderId}</TableCell>
+        <TableCell>{order?.customer || '-'}</TableCell>
+        <TableCell>{order?.item || '-'}</TableCell>
+        <TableCell>{order?.quantity || '-'}</TableCell>
+        <TableCell>{machine?.name || schedule.machineId}</TableCell>
+        <TableCell>{new Date(schedule.start_time).toLocaleDateString()}</TableCell>
+        <TableCell>{new Date(schedule.end_time).toLocaleDateString()}</TableCell>
+        <TableCell>{order?.priority || '-'}</TableCell>
+        <TableCell>
+          <Chip 
+            label={schedule.status || 'Scheduled'} 
+            color={schedule.status === 'In Progress' ? 'primary' : 'default'} 
+            size="small" 
+          />
+        </TableCell>
+      </TableRow>
+    );
+  })
+  
   // Mock data for production schedule
   useEffect(() => {
     const mockScheduleData = [
@@ -262,7 +325,7 @@ const ProductionPriority = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, height: 'auto', overflow: 'hidden', pt: 2, pb: 5, bgcolor: 'rgba(255,255,255,0.95)', width: '100%', margin: '5% auto' }}>
+    <Box sx={{ flexGrow: 1, height: 'auto', overflow: 'hidden', pt: 2, pb: 5, bgcolor: 'rgba(255,255,255,0.95)', width: '95%', margin: '5% auto' }}>
       <Container maxWidth={false} sx={{ px: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -278,7 +341,7 @@ const ProductionPriority = () => {
             >
               Run Optimization
             </Button>
-            {optimizationRun && (
+            {/* {optimizationRun && (
               <FormControlLabel
                 control={
                   <Switch 
@@ -288,14 +351,14 @@ const ProductionPriority = () => {
                 }
                 label="Show Recommendations"
               />
-            )}
+            )} */}
           </Box>
         </Box>
 
         <Grid container spacing={3}>
             
          
-          <Grid item xs={12} md={showRecommendations ? 8 : 12}>
+          <Grid item xs={12} md={showRecommendations ? 4 : 12}>
             <Paper elevation={3} sx={{ p: 2, mb: 3 }}>
               <Typography variant="h6" gutterBottom>Current Production Schedule</Typography>
               <TableContainer>
@@ -303,57 +366,51 @@ const ProductionPriority = () => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Order ID</TableCell>
-                      <TableCell>Product</TableCell>
+                      <TableCell>Customer</TableCell>
+                      <TableCell>Item</TableCell>
                       <TableCell>Quantity</TableCell>
                       <TableCell>Machine</TableCell>
                       <TableCell>Start Date</TableCell>
                       <TableCell>End Date</TableCell>
                       <TableCell>Priority</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Constraints</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {scheduleData.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.id}</TableCell>
-                        <TableCell>{row.product}</TableCell>
-                        <TableCell>{row.quantity}</TableCell>
-                        <TableCell>{row.machine}</TableCell>
-                        <TableCell>{row.startDate}</TableCell>
-                        <TableCell>{row.endDate}</TableCell>
-                        <TableCell>{row.priority}</TableCell>
-                        <TableCell>
-                          <Chip 
-                            label={row.status} 
-                            color={row.status === 'In Progress' ? 'primary' : 'default'} 
-                            size="small" 
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {row.isNonChangeable && (
-                            <Tooltip title="Non-changeable order">
-                              <Chip 
-                                label="Fixed" 
-                                color="error" 
-                                size="small" 
-                                icon={<CancelIcon />} 
-                              />
-                            </Tooltip>
-                          )}
-                          {row.utilization > 90 && (
-                            <Tooltip title="High machine utilization">
-                              <Chip 
-                                label="High Load" 
-                                color="warning" 
-                                size="small" 
-                                sx={{ ml: 1 }} 
-                              />
-                            </Tooltip>
-                          )}
-                        </TableCell>
+                    {loading ? (
+                      <TableRow>
+                        <TableCell colSpan={9} align="center">Loading...</TableCell>
                       </TableRow>
-                    ))}
+                    ) : scheduleData.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={9} align="center">No schedule data found</TableCell>
+                      </TableRow>
+                    ) : (
+                      scheduleData.map((schedule) => {
+                        // Find the matching order using the correct orderId from schedule
+                        const order = orders.find(o => o._id === schedule.orderId);
+                        const machine = machines.find(m => m._id === schedule.machineId);
+                        return (
+                          <TableRow key={schedule._id}>
+                            <TableCell>{order?.orderId || '-'}</TableCell>
+                            <TableCell>{order?.customer || '-'}</TableCell>
+                            <TableCell>{order?.item || '-'}</TableCell>
+                            <TableCell>{order?.quantity || '-'}</TableCell>
+                            <TableCell>{machine?.name || schedule.machineId}</TableCell>
+                            <TableCell>{new Date(schedule.start_time).toLocaleDateString()}</TableCell>
+                            <TableCell>{new Date(schedule.end_time).toLocaleDateString()}</TableCell>
+                            <TableCell>{order?.priority || '-'}</TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={schedule.status || 'Scheduled'} 
+                                color={schedule.status === 'In Progress' ? 'primary' : 'default'} 
+                                size="small" 
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -381,14 +438,15 @@ const ProductionPriority = () => {
                         variant="outlined" 
                         sx={{ 
                           cursor: 'pointer',
-                          '&:hover': { boxShadow: 3 }
+                          '&:hover': { boxShadow: 3 },
+                          textAlign:'left'
                         }}
                         onClick={() => handleRecommendationClick(rec)}
                       >
                         <CardHeader
                           avatar={getRecommendationIcon(rec.type)}
                           title={
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', textAlign:'left' }}>
                               <Typography variant="subtitle1">
                                 {rec.type === 'reschedule' && 'Reschedule Order'}
                                 {rec.type === 'outsource' && 'Outsource Order'}
@@ -406,7 +464,7 @@ const ProductionPriority = () => {
                           subheader={`Order: ${rec.orderId}`}
                         />
                         <CardContent>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.primary">
                             {rec.reason}
                           </Typography>
                           <Divider sx={{ my: 1 }} />
@@ -430,8 +488,8 @@ const ProductionPriority = () => {
           <DialogContent>
             {selectedRecommendation && (
               <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6">
+                <Grid item xs={12} sx={{ display: 'flex', width: '100%' }}>
+                  <Typography variant="h6" sx={{width: '100%'}}>
                     {selectedRecommendation.type === 'reschedule' && 'Reschedule Order'}
                     {selectedRecommendation.type === 'outsource' && 'Outsource Order'}
                     {selectedRecommendation.type === 'extra-shift' && 'Add Extra Shift'}
@@ -510,7 +568,7 @@ const ProductionPriority = () => {
                   </Paper>
                 </Grid>
                 
-                <Grid item xs={12}>
+                <Grid item xs={12} gap={3} sx={{ display: 'flex', width: '100%' }}>
                   <Alert severity="info" sx={{ mb: 2 }}>
                     <Typography variant="subtitle2">Reason:</Typography>
                     {selectedRecommendation.reason}
