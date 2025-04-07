@@ -8,6 +8,7 @@ import SalesOrders from './pages/SalesOrders';
 import BillOfMaterials from './pages/BillOfMaterials';
 import ProductionPriority from './pages/ProductionPriority';
 import Dashboard from './pages/Dashboard';
+import SchedulerFetcher from './pages/SchedulerFetcher';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -24,7 +25,8 @@ function App() {
             <Button color="inherit" component={Link} to="/sales-orders"> Orders</Button>
             <Button color="inherit" component={Link} to="/machines">Machines</Button>
             <Button color="inherit" component={Link} to="/schedules">Schedules</Button>
-            <Button color="inherit" component={Link} to="/production-priority">Production Priority</Button>
+            {/* <Button color="inherit" component={Link} to="/production-priority">Production Priority</Button> */}
+            <Button color="inherit" component={Link} to="/scheduler">Scheduler AI</Button>
            
             {/* <Button color="inherit" component={Link} to="/bom">BOM</Button> */}
           </Box>
@@ -38,6 +40,7 @@ function App() {
         <Route path="/bom" element={<BillOfMaterials />} />
         <Route path="/production-priority" element={<ProductionPriority />} />
         <Route path="/" element={<Dashboard />} />
+        <Route path="/scheduler" element={<SchedulerFetcher />} />
       </Routes>
     </Router>
   );

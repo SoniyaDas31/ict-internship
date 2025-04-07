@@ -39,6 +39,7 @@ import {
   Visibility as VisibilityIcon,
   NotificationsActive as NotificationsActiveIcon,
 } from '@mui/icons-material';
+import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 
 const ProductionPriority = () => {
   const [scheduleData, setScheduleData] = useState([]);

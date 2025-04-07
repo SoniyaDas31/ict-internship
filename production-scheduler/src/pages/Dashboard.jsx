@@ -43,8 +43,8 @@ const Dashboard = () => {
           <Button variant="contained" color="secondary" size="large" component={Link} to="/bom">
             Manage BOM
           </Button> */}
-          <Button variant="contained" color="secondary" size="large" component={Link} to="/production-priority">
-            Production Priority
+          <Button variant="contained" color="secondary" size="large" component={Link} to="/scheduler">
+            Scheduler AI
           </Button>
         </Box>
       </Paper>
