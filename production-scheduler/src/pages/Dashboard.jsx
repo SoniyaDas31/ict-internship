@@ -44,7 +44,7 @@ const Dashboard = () => {
             Manage BOM
           </Button> */}
           <Button variant="contained" color="secondary" size="large" component={Link} to="/scheduler">
-            Scheduler AI
+            Scheduler Suggestions
           </Button>
         </Box>
       </Paper>

@@ -26,7 +26,7 @@ function App() {
             <Button color="inherit" component={Link} to="/machines">Machines</Button>
             <Button color="inherit" component={Link} to="/schedules">Schedules</Button>
             {/* <Button color="inherit" component={Link} to="/production-priority">Production Priority</Button> */}
-            <Button color="inherit" component={Link} to="/scheduler">Scheduler Analytics</Button>
+            <Button color="inherit" component={Link} to="/scheduler">Scheduler Suggestions</Button>
            
             {/* <Button color="inherit" component={Link} to="/bom">BOM</Button> */}
           </Box>
