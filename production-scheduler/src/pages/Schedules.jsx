@@ -29,6 +29,13 @@ import {
   Cancel as CancelIcon,
   Lock as LockIcon,
 } from '@mui/icons-material';
+ import {
+  CircularProgress,
+  Chip,
+} from '@mui/material';
+import {
+  Edit as EditIcon,
+} from '@mui/icons-material';
 
 const Schedules = () => {
   const [viewMode, setViewMode] = useState('table');
@@ -49,39 +56,41 @@ const Schedules = () => {
   
   const fetchSchedules = async () => {
     try {
-      const response = await fetch('https://kera-internship.onrender.com/schedule');
+      const response = await fetch('https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/67d1db90a8e768e199bdc947');
       const data = await response.json();
-      setSchedules(data);
       
-      // Calculate metrics from schedule data
-      const totalOrders = data.length;
+      // Transform the data to match the expected format
+      const transformedData = data.schedules.map(item => ({
+        _id: item._id,
+        orderId: item.orderID.orderId,
+        customer: item.orderID.customer,
+        item: item.orderID.item,
+        machineId: item.machineID,
+        process: item.stageName,
+        start_time: item.scheduledStart,
+        end_time: item.scheduledEnd,
+        status: item.status,
+        quantity: item.quantity,
+        isManualApprovalRequired: item.isManualApprovalRequired,
+        isApproved: item.isApproved,
+        priority: item.orderID.priority,
+        isNonChangeable: item.orderID.isNonChangeable
+      }));
       
-      // Calculate orders at risk (orders ending within 24 hours)
+      setSchedules(transformedData);
+      
+      // Calculate metrics
+      const totalOrders = transformedData.length;
       const now = new Date();
-      const ordersAtRisk = data.filter(schedule => {
+      const ordersAtRisk = transformedData.filter(schedule => {
         const endTime = new Date(schedule.end_time);
         const timeLeft = endTime - now;
         return timeLeft <= 24 * 60 * 60 * 1000 && timeLeft > 0;
       }).length;
-  
-      // Calculate pending approvals (schedules with pending status)
-      const pendingApprovals = data.filter(schedule => 
-        schedule.status === 'pending' || schedule.status === 'Pending'
-      ).length;
-  
-      // Calculate idle capacity
-      const totalMachines = new Set(data.map(s => s.machineId)).size;
-      const activeMachines = new Set(data.filter(s => 
-        new Date(s.end_time) > now
-      ).map(s => s.machineId)).size;
-      const idleCapacity = totalMachines ? 
-        Math.round(((totalMachines - activeMachines) / totalMachines) * 100) : 0;
-  
+
       setMetrics({
         totalOrders,
-        idleCapacity: `${idleCapacity}%`,
         ordersAtRisk,
-        pendingApprovals
       });
       
       setLoading(false);
@@ -91,12 +100,113 @@ const Schedules = () => {
     }
   };
 
+  // Update the table structure
+  <TableContainer sx={{ maxHeight: 440 }}>
+    <Table stickyHeader>
+      <TableHead>
+        <TableRow>
+          <TableCell>Order ID</TableCell>
+          <TableCell>Customer</TableCell>
+          <TableCell>Item</TableCell>
+          <TableCell>Process</TableCell>
+          <TableCell>Machine ID</TableCell>
+          <TableCell>Start Time</TableCell>
+          <TableCell>End Time</TableCell>
+          <TableCell>Quantity</TableCell>
+          <TableCell>Status</TableCell>
+          <TableCell>Priority</TableCell>
+          <TableCell>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {loading ? (
+          <TableRow>
+            <TableCell colSpan={11} align="center">
+              <CircularProgress size={24} sx={{ mr: 1 }} />
+              Loading schedules...
+            </TableCell>
+          </TableRow>
+        ) : schedules.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={11} align="center">No schedules found</TableCell>
+          </TableRow>
+        ) : (
+          schedules.map((schedule) => (
+            <TableRow 
+              key={schedule._id}
+              sx={{
+                bgcolor: schedule.isNonChangeable ? 'rgba(255, 224, 224, 0.4)' : 'inherit'
+              }}
+            >
+              <TableCell>{schedule.orderId}</TableCell>
+              <TableCell>{schedule.customer}</TableCell>
+              <TableCell>{schedule.item}</TableCell>
+              <TableCell>{schedule.process}</TableCell>
+              <TableCell>{schedule.machineId}</TableCell>
+              <TableCell>
+                {new Date(schedule.start_time).toLocaleString('en-US', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short'
+                })}
+              </TableCell>
+              <TableCell>
+                {new Date(schedule.end_time).toLocaleString('en-US', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short'
+                })}
+              </TableCell>
+              <TableCell>{schedule.quantity}</TableCell>
+              <TableCell>
+                <Chip
+                  label={schedule.status}
+                  color={
+                    schedule.status === 'Completed' ? 'success' :
+                    schedule.status === 'Scheduled' ? 'primary' :
+                    schedule.status === 'In Progress' ? 'info' :
+                    'default'
+                  }
+                  size="small"
+                />
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={`P${schedule.priority}`}
+                  color={
+                    schedule.priority === 1 ? 'error' :
+                    schedule.priority === 2 ? 'warning' :
+                    'default'
+                  }
+                  size="small"
+                />
+                {schedule.isNonChangeable && (
+                  <Tooltip title="Non-changeable">
+                    <LockIcon fontSize="small" color="error" sx={{ ml: 1 }} />
+                  </Tooltip>
+                )}
+              </TableCell>
+              <TableCell>
+                <IconButton 
+                  size="small" 
+                  color="primary"
+                  onClick={() => setDrawerOpen(true)}
+                  disabled={schedule.isNonChangeable}
+                >
+                  <EditIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  </TableContainer>
+  
   // Update the metrics rendering
   const metricsData = [
-    { title: 'Total Orders', value: metrics.totalOrders },
-    { title: 'Idle Capacity', value: metrics.idleCapacity },
-    { title: 'Orders at Risk', value: metrics.ordersAtRisk },
-    { title: 'Pending Approvals', value: metrics.pendingApprovals },
+    { title: 'Total Schedules', value: metrics.totalOrders },
+    // { title: 'Machine Capacity', value: metrics.idleCapacity },
+    { title: 'Schedules at Risk', value: metrics.ordersAtRisk },
+    // { title: 'Pending Approvals', value: metrics.pendingApprovals },
   ];
 
   const orders = [
@@ -182,7 +292,6 @@ const Schedules = () => {
                   <TableCell>Start Time</TableCell>
                   <TableCell>End Time</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -202,14 +311,6 @@ const Schedules = () => {
                       <TableCell>{new Date(schedule.start_time).toLocaleString()}</TableCell>
                       <TableCell>{new Date(schedule.end_time).toLocaleString()}</TableCell>
                       <TableCell>{schedule.status}</TableCell>
-                      <TableCell>
-                        <IconButton size="small" color="primary">
-                          <CheckCircleIcon />
-                        </IconButton>
-                        <IconButton size="small" color="error">
-                          <CancelIcon />
-                        </IconButton>
-                      </TableCell>
                     </TableRow>
                   ))
                 )}
