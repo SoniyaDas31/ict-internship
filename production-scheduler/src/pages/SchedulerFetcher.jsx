@@ -20,7 +20,7 @@ const SchedulerFetcher = () => {
         const machinesRaw = await machinesRes.json();
         const scheduleRaw = await scheduleRes.json();
 
-        console.log('Raw Orders:', ordersRaw);
+        console.log('Raw Order:', ordersRaw);
         console.log('Raw Machines:', machinesRaw);
         console.log('Raw Schedule:', scheduleRaw);
 
