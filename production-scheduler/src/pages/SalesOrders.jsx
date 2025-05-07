@@ -91,6 +91,7 @@ const SalesOrders = () => {
     try {
       const response = await fetch('https://kera-internship.onrender.com/order');
       const data = await response.json();
+      console.log('Fetched orders:', data); // Debugging line
       setOrders(data);
       setLoading(false);
     } catch (error) {
@@ -103,7 +104,8 @@ const SalesOrders = () => {
   const filteredOrders = orders.filter(order =>
     order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.item.toLowerCase().includes(searchTerm.toLowerCase())
+    order.item.toLowerCase().includes(searchTerm.toLowerCase())||
+    order.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Update table structure to match API data
@@ -142,6 +144,8 @@ const SalesOrders = () => {
                 <TableCell>Order Date</TableCell>
                 <TableCell>Delivery Date</TableCell>
                 <TableCell>Priority</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>IsNonChangable</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -162,9 +166,12 @@ const SalesOrders = () => {
                     <TableCell>{order.item}</TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{order.rate}</TableCell>
+                 
                     <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
                     <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
                     <TableCell>{order.priority}</TableCell>
+                    <TableCell>{order.status}</TableCell>
+                    <TableCell>{order.isNonChangeable}</TableCell>
                     <TableCell>
                       <IconButton color="primary" size="small">
                         <EditIcon />
@@ -237,7 +244,7 @@ const SalesOrders = () => {
                 onChange={handleInputChange}
                 InputLabelProps={{ shrink: true }}
               />
-              <TextField
+                 <TextField
                 name="priority"
                 label="Priority"
                 type="number"
@@ -245,6 +252,23 @@ const SalesOrders = () => {
                 value={formData.priority}
                 onChange={handleInputChange}
               />
+              <TextField
+                name="status"
+                label="status"
+                type="string"
+                required
+                value={formData.priority}
+                onChange={handleInputChange}
+              />
+                 <TextField
+                name="isNonChangeable"
+                label="isNonChangeable"
+                type="string"
+                required
+                value={formData.priority}
+                onChange={handleInputChange}
+              />
+              
             </Stack>
           </DialogContent>
           <DialogActions>

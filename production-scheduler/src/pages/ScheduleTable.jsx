@@ -21,6 +21,10 @@ import {
 import { Search as SearchIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import axios from 'axios';
 
+// Add this before making API calls
+const token = localStorage.getItem('token');
+axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
 const Schedules = () => {
   // State for schedules, loading, and error messaging
   const [schedules, setSchedules] = useState([]);
@@ -84,7 +88,7 @@ const Schedules = () => {
 
   return (
     <Container>
-      <Box sx={{ my: 4 }}>
+      <Box sx={{ my: 4, background: '#ffffff', p:2, bgcolor: 'rgba(255,255,255,0.95)', margin: '5% auto'}}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -93,7 +97,7 @@ const Schedules = () => {
         </Box>
 
         {/* Search Area */}
-        <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
+        <Grid container spacing={2} alignItems="center" sx={{ mb: 3, background: '#fff'}}>
           <Grid item xs={12} md={8}>
             <TextField
               fullWidth

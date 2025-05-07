@@ -34,7 +34,7 @@ const Dashboard = () => {
           <Button variant="contained" color="secondary" size="large" component={Link} to="/machines">
             View Machine
           </Button>
-          <Button variant="contained" color="secondary" size="large" component={Link} to="/schedules">
+          <Button variant="contained" color="secondary" size="large" component={Link} to="/schedule-list">
             Manage Schedule
           </Button>
           {/* <Button variant="contained" color="secondary" size="large" component={Link} to="/sales-orders">
@@ -43,8 +43,8 @@ const Dashboard = () => {
           <Button variant="contained" color="secondary" size="large" component={Link} to="/bom">
             Manage BOM
           </Button> */}
-          <Button variant="contained" color="secondary" size="large" component={Link} to="/scheduler">
-            Scheduler Suggestions
+          <Button variant="contained" color="secondary" size="large" component={Link} to="/auto-scheduling">
+          Auto  Scheduler
           </Button>
         </Box>
       </Paper>
