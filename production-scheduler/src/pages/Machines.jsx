@@ -119,7 +119,7 @@ const Machines = () => {
 
   const fetchMachines = async () => {
     try {
-      const response = await fetch('https://kera-internship.onrender.com/machine');
+      const response = await fetch('https://kera-internship.onrender.com/schedule');
       const data = await response.json();
       setMachines(data);
       setLoading(false);
@@ -130,7 +130,7 @@ const Machines = () => {
   };
 
   const filteredMachines = machines.filter(machine => {
-    const matchesSearch = machine.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = machine.machineId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !filterType || machine.process === filterType;
     return matchesSearch && matchesType;
   });
@@ -225,11 +225,11 @@ const Machines = () => {
                 filteredMachines.map((machine) => (
                   <TableRow key={machine._id}>
                     {/* Remove the ID cell from row */}
-                    <TableCell>{machine.name}</TableCell>
+                    <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
-                    <TableCell>{machine.unit}</TableCell>
+                    <TableCell>{machine.unit_material_per_product}</TableCell>
                     <TableCell>{machine.batch_size}</TableCell>
-                    <TableCell>{machine.time}</TableCell>
+                    <TableCell>{machine.time_per_product}</TableCell>
                     <TableCell>
                       <IconButton color="primary" size="small" onClick={() => handleEdit(machine)}>
                         <EditIcon />

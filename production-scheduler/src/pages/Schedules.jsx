@@ -61,6 +61,8 @@ const Schedules = () => {
       // Calling the route that returns schedules for a particular order
       const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
       if (response.data.schedules) {
+        
+         console.log('Schedules:', response.data.schedules); // Debugging line
         setSchedules(response.data.schedules);
       } else {
         setSchedules([]);
@@ -160,7 +162,6 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Batch #</TableCell>
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
@@ -189,7 +190,6 @@ const Schedules = () => {
                         <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
                         <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
                         <TableCell>{schedule.status}</TableCell>
-                        <TableCell>{schedule.batchNumber}</TableCell>
                         <TableCell>{schedule.quantity}</TableCell>
                       </TableRow>
                     ))
