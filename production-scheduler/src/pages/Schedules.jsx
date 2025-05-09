@@ -160,7 +160,7 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Batch #</TableCell>
+                    {/* <TableCell>Batch #</TableCell> */}
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
@@ -174,23 +174,13 @@ const Schedules = () => {
                   ) : (
                     schedules.map((schedule, index) => (
                       <TableRow key={index}>
-                        {/* Display Order ID */}
-                        <TableCell>
-                          {typeof schedule.orderID === 'object'
-                            ? schedule.orderID.orderId || schedule.orderID._id || 'N/A'
-                            : schedule.orderID}
-                        </TableCell>
-                        <TableCell>{schedule.stageName}</TableCell>
-                        <TableCell>
-                          {typeof schedule.machineID === 'object'
-                            ? schedule.machineID.machineId || 'N/A'
-                            : schedule.machineID}
-                        </TableCell>
+                        <TableCell>{schedule.orderNumber || 'N/A'}</TableCell>
+                        <TableCell>{schedule.stageName || 'N/A'}</TableCell>
+                        <TableCell>{schedule.machineName || 'N/A'}</TableCell>
                         <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
                         <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
-                        <TableCell>{schedule.status}</TableCell>
-                        <TableCell>{schedule.batchNumber}</TableCell>
-                        <TableCell>{schedule.quantity}</TableCell>
+                        <TableCell>{schedule.status || 'N/A'}</TableCell>
+                        <TableCell>{schedule.quantity || 'N/A'}</TableCell>
                       </TableRow>
                     ))
                   )}
