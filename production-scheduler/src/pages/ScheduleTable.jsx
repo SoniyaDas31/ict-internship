@@ -21,10 +21,7 @@ import {
 import { Search as SearchIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import axios from 'axios';
 
-// Add this before making API calls
-const token = localStorage.getItem('token');
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
+// Move token setup into useEffect to ensure it's always up to date
 const Schedules = () => {
   // State for schedules, loading, and error messaging
   const [schedules, setSchedules] = useState([]);
@@ -34,9 +31,14 @@ const Schedules = () => {
 
   // On mount, fetch all schedules
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
     fetchAllSchedules();
   }, []);
 
+  // Remove the token setup from the top level
   // Function to fetch all schedules from internal schedule API
   const fetchAllSchedules = async () => {
     setLoading(true);

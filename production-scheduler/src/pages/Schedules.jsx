@@ -86,7 +86,7 @@ const Schedules = () => {
 
   return (
     <Container>
-      <Box sx={{ my: 4 }}>
+      <Box sx={{ my: 4,  bgcolor: 'rgba(255,255,255,0.95)', px:5, py:5 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -162,10 +162,6 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
-<<<<<<< HEAD
-=======
-                    {/* <TableCell>Batch #</TableCell> */}
->>>>>>> 0fb3bc596ca7ef481b5d85e87ec85c09970edb87
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
@@ -184,13 +180,8 @@ const Schedules = () => {
                         <TableCell>{schedule.machineName || 'N/A'}</TableCell>
                         <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
                         <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
-<<<<<<< HEAD
                         <TableCell>{schedule.status}</TableCell>
                         <TableCell>{schedule.quantity}</TableCell>
-=======
-                        <TableCell>{schedule.status || 'N/A'}</TableCell>
-                        <TableCell>{schedule.quantity || 'N/A'}</TableCell>
->>>>>>> 0fb3bc596ca7ef481b5d85e87ec85c09970edb87
                       </TableRow>
                     ))
                   )}

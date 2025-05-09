@@ -231,19 +231,9 @@ const Machines = () => {
                     {/* Remove the ID cell from row */}
                     <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
-<<<<<<< HEAD
                     <TableCell>{machine.unit_material_per_product}</TableCell>
                     <TableCell>{machine.batch_size}</TableCell>
                     <TableCell>{machine.time_per_product}</TableCell>
-=======
-                    {/* <TableCell>{machine.unit}</TableCell> */}
-                    <TableCell>{machine.batch_size}</TableCell>
-                    <TableCell>{machine.startTime}</TableCell>
-                    <TableCell>{machine.endTime}</TableCell>
-                    <TableCell>
-                      <Chip label={machine.status} color={machine.status === 'Active' ? 'success' : 'warning'} />
-                    </TableCell>
->>>>>>> 0fb3bc596ca7ef481b5d85e87ec85c09970edb87
                     <TableCell>
                       <IconButton color="primary" size="small" onClick={() => handleEdit(machine)}>
                         <EditIcon />
