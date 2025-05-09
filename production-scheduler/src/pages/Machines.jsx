@@ -64,8 +64,8 @@ const Machines = () => {
   const handleSubmit = async () => {
     try {
       const url = editingId
-        ? `https://kera-internship.onrender.com/schedule/edit/${editingId}`
-        : 'https://kera-internship.onrender.com/schedule/add';
+        ? `https://kera-internship.onrender.com/schedule/${editingId}`
+        : 'https://kera-internship.onrender.com/schedule';
       const method = editingId ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -229,8 +229,6 @@ const Machines = () => {
                 <TableCell>Name</TableCell>
                 <TableCell>Process</TableCell>
                 <TableCell>Batch Size</TableCell>
-                <TableCell>Start Time</TableCell>
-                <TableCell>End Time</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -250,8 +248,6 @@ const Machines = () => {
                     <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
                     <TableCell>{machine.batch_size}</TableCell>
-                    <TableCell>{new Date(machine.startTime).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(machine.endTime).toLocaleString()}</TableCell> 
                     <TableCell>
                       <Chip label={machine.status} color={machine.status === 'Active' ? 'success' : 'warning'} />
                     </TableCell>
