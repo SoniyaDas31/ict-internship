@@ -41,20 +41,16 @@ const Machines = () => {
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     machineId: '',
-    name: '',
-    type: '',
-    operations: '',
-    capacityPerHr: '',
-    mainOperator: '',
-    asstOperators: '',
-    helpers: '',
-    totalCostPerHr: '',
-    powerAndFuel: '',
-    repairMaintenance: '',
-    depreciationCost: '',
+    process: '',
+    batch_size: '',
+    unit_material_per_product: '',
+    time_per_product: '',
+    startTime: '',
+    endTime: '',
+    shiftHoursPerDay: '',
+    workingDays: '',
+    assignedOrders: [],
     status: '',
-    location: '',
-    notes: ''
   });
 
   const handleInputChange = (e) => {
@@ -67,49 +63,56 @@ const Machines = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://kera-internship.onrender.com/schedule', {
-        method: 'POST',
+      const url = editingId
+        ? `https://kera-internship.onrender.com/schedule/edit/${editingId}`
+        : 'https://kera-internship.onrender.com/schedule/add';
+      const method = editingId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          process: formData.type,
-          unit: formData.unit || 'KGS',
+          machineId: formData.machineId,
+          process: formData.process,
           batch_size: Number(formData.batch_size),
-          time: Number(formData.time),
-        })
+          unit_material_per_product: Number(formData.unit_material_per_product),
+          time_per_product: Number(formData.time_per_product),
+          startTime: formData.startTime,
+          endTime: formData.endTime,
+          shiftHoursPerDay: Number(formData.shiftHoursPerDay),
+          workingDays: Number(formData.workingDays),
+          assignedOrders: formData.assignedOrders,
+          status: formData.status,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add machine');
+        throw new Error('Failed to save machine');
       }
 
       // Refresh the machines list
       await fetchMachines();
-      
+
       // Reset form and close dialog
       setFormData({
         machineId: '',
-        name: '',
-        type: '',
-        operations: '',
-        capacityPerHr: '',
-        mainOperator: '',
-        asstOperators: '',
-        helpers: '',
-        totalCostPerHr: '',
-        powerAndFuel: '',
-        repairMaintenance: '',
-        depreciationCost: '',
+        process: '',
+        batch_size: '',
+        unit_material_per_product: '',
+        time_per_product: '',
+        startTime: '',
+        endTime: '',
+        shiftHoursPerDay: '',
+        workingDays: '',
+        assignedOrders: [],
         status: '',
-        location: '',
-        notes: ''
       });
       setOpen(false);
+      setEditingId(null); // Reset editing ID
     } catch (error) {
-      console.error('Error adding machine:', error);
-      // You might want to show an error message to the user here
+      console.error('Error saving machine:', error);
     }
   };
 
@@ -129,6 +132,24 @@ const Machines = () => {
     }
   };
 
+  const handleEdit = (machine) => {
+    setEditingId(machine._id);
+    setFormData({
+      machineId: machine.machineId,
+      process: machine.process,
+      batch_size: machine.batch_size,
+      unit_material_per_product: machine.unit_material_per_product,
+      time_per_product: machine.time_per_product,
+      startTime: machine.startTime,
+      endTime: machine.endTime,
+      shiftHoursPerDay: machine.shiftHoursPerDay,
+      workingDays: machine.workingDays,
+      assignedOrders: machine.assignedOrders,
+      status: machine.status,
+    });
+    setOpen(true);
+  };
+
   const filteredMachines = machines.filter(machine => {
     const matchesSearch = machine.machineId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !filterType || machine.process === filterType;
@@ -143,10 +164,10 @@ const Machines = () => {
       height: 'auto', 
       overflow: 'hidden', 
       pt: 2,
-      pb: 5,  // Adjusted to account for AppBar
-      bgcolor: 'rgba(255,255,255,0.95)',  // Changed background color
-      width: '90%',  // Changed width
-      margin: '5% auto'  // Adjusted margin
+      pb: 5, 
+      bgcolor: 'rgba(255,255,255,0.95)', 
+      width: '90%',  
+      margin: '5% auto'  
     }}>
       <Container maxWidth={false} sx={{ px: 3 }}>
         {/* Header */}
@@ -205,10 +226,8 @@ const Machines = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {/* Remove the ID column from header */}
                 <TableCell>Name</TableCell>
                 <TableCell>Process</TableCell>
-                {/* <TableCell>Unit</TableCell> */}
                 <TableCell>Batch Size</TableCell>
                 <TableCell>Start Time</TableCell>
                 <TableCell>End Time</TableCell>
@@ -219,22 +238,20 @@ const Machines = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">Loading...</TableCell>
+                  <TableCell colSpan={5} align="center">Loading...</TableCell>
                 </TableRow>
               ) : filteredMachines.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">No machines found</TableCell>
+                  <TableCell colSpan={5} align="center">No machines found</TableCell>
                 </TableRow>
               ) : (
                 filteredMachines.map((machine) => (
                   <TableRow key={machine._id}>
-                    {/* Remove the ID cell from row */}
                     <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
-                    {/* <TableCell>{machine.unit}</TableCell> */}
                     <TableCell>{machine.batch_size}</TableCell>
-                    <TableCell>{machine.startTime}</TableCell>
-                    <TableCell>{machine.endTime}</TableCell>
+                    <TableCell>{new Date(machine.startTime).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(machine.endTime).toLocaleString()}</TableCell> 
                     <TableCell>
                       <Chip label={machine.status} color={machine.status === 'Active' ? 'success' : 'warning'} />
                     </TableCell>
@@ -252,7 +269,7 @@ const Machines = () => {
 
         {/* Add/Edit Machine Dialog */}
         <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Add New Machine</DialogTitle>
+          <DialogTitle>{editingId ? 'Edit Machine' : 'Add New Machine'}</DialogTitle>
           <DialogContent>
             <Stack spacing={3} sx={{ mt: 2 }}>
               <TextField 
@@ -263,68 +280,88 @@ const Machines = () => {
                 onChange={handleInputChange}
               />
               <TextField 
-                name="name"
-                label="Name" 
+                name="process"
+                label="Process" 
                 required 
-                value={formData.name}
+                value={formData.process}
                 onChange={handleInputChange}
               />
-              <FormControl required>
-                <InputLabel>Type</InputLabel>
-                <Select 
-                  name="type"
-                  label="Type"
-                  value={formData.type}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="COMPOUND MIXING">COMPOUND MIXING</MenuItem>
-                  <MenuItem value="TUFTING">TUFTING</MenuItem>
-                  <MenuItem value="CUTTING">CUTTING</MenuItem>
-                  <MenuItem value="LABELLING & PACKING">LABELLING & PACKING</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl required>
+              <TextField 
+                name="batch_size"
+                label="Batch Size" 
+                type="number" 
+                required 
+                value={formData.batch_size}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="unit_material_per_product"
+                label="Unit Material per Product" 
+                type="number" 
+                required 
+                value={formData.unit_material_per_product}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="time_per_product"
+                label="Time per Product (in hours)" 
+                type="number" 
+                required 
+                value={formData.time_per_product}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="startTime"
+                label="Start Time" 
+                required 
+                value={formData.startTime}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="endTime"
+                label="End Time" 
+                required 
+                value={formData.endTime}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="shiftHoursPerDay"
+                label="Shift Hours per Day" 
+                type="number" 
+                required 
+                value={formData.shiftHoursPerDay}
+                onChange={handleInputChange}
+              />
+              <TextField 
+                name="workingDays"
+                label="Working Days per Week" 
+                type="number" 
+                required 
+                value={formData.workingDays}
+                onChange={handleInputChange}
+              />
+              <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
-                <Select 
-                  name="status"
+                <Select
                   label="Status"
+                  name="status"
                   value={formData.status}
                   onChange={handleInputChange}
+                  required
                 >
                   <MenuItem value="Active">Active</MenuItem>
                   <MenuItem value="Maintenance">Maintenance</MenuItem>
                   <MenuItem value="Offline">Idle</MenuItem>
                 </Select>
               </FormControl>
-              <TextField 
-                name="capacity"
-                label="Capacity (Units/Hr)" 
-                type="number" 
-                required 
-                value={formData.capacity}
-                onChange={handleInputChange}
-              />
-              <TextField 
-                name="location"
-                label="Location" 
-                required 
-                value={formData.location}
-                onChange={handleInputChange}
-              />
-              <TextField 
-                name="notes"
-                label="Notes" 
-                multiline 
-                rows={4}
-                value={formData.notes}
-                onChange={handleInputChange}
-              />
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              Save
+            <Button onClick={() => setOpen(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} color="primary">
+              {editingId ? 'Update' : 'Add'}
             </Button>
           </DialogActions>
         </Dialog>
