@@ -67,7 +67,7 @@ const Machines = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://kera-internship.onrender.com/machine', {
+      const response = await fetch('https://kera-internship.onrender.com/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +132,9 @@ const Machines = () => {
   const filteredMachines = machines.filter(machine => {
     const matchesSearch = machine.machineId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = !filterType || machine.process === filterType;
-    return matchesSearch && matchesType;
+    const matchesStatus = !filterStatus || machine.status === filterStatus;
+
+    return matchesSearch && matchesType && matchesStatus;
   });
 
   return (
@@ -193,7 +195,7 @@ const Machines = () => {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Maintenance">Maintenance</MenuItem>
-              <MenuItem value="Offline">Offline</MenuItem>
+              <MenuItem value="Offline">Idle</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -206,9 +208,11 @@ const Machines = () => {
                 {/* Remove the ID column from header */}
                 <TableCell>Name</TableCell>
                 <TableCell>Process</TableCell>
-                <TableCell>Unit</TableCell>
+                {/* <TableCell>Unit</TableCell> */}
                 <TableCell>Batch Size</TableCell>
-                <TableCell>Time (Hours)</TableCell>
+                <TableCell>Start Time</TableCell>
+                <TableCell>End Time</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -227,9 +231,19 @@ const Machines = () => {
                     {/* Remove the ID cell from row */}
                     <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
+<<<<<<< HEAD
                     <TableCell>{machine.unit_material_per_product}</TableCell>
                     <TableCell>{machine.batch_size}</TableCell>
                     <TableCell>{machine.time_per_product}</TableCell>
+=======
+                    {/* <TableCell>{machine.unit}</TableCell> */}
+                    <TableCell>{machine.batch_size}</TableCell>
+                    <TableCell>{machine.startTime}</TableCell>
+                    <TableCell>{machine.endTime}</TableCell>
+                    <TableCell>
+                      <Chip label={machine.status} color={machine.status === 'Active' ? 'success' : 'warning'} />
+                    </TableCell>
+>>>>>>> 0fb3bc596ca7ef481b5d85e87ec85c09970edb87
                     <TableCell>
                       <IconButton color="primary" size="small" onClick={() => handleEdit(machine)}>
                         <EditIcon />
@@ -285,7 +299,7 @@ const Machines = () => {
                 >
                   <MenuItem value="Active">Active</MenuItem>
                   <MenuItem value="Maintenance">Maintenance</MenuItem>
-                  <MenuItem value="Offline">Offline</MenuItem>
+                  <MenuItem value="Offline">Idle</MenuItem>
                 </Select>
               </FormControl>
               <TextField 

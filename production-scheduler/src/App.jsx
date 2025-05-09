@@ -91,7 +91,7 @@ function App() {
         } />
         <Route path="/schedule-list" element={
           <ProtectedRoute>
-            <ScheduleTable />
+            <Schedules />
           </ProtectedRoute>
         } />
       </Routes>
