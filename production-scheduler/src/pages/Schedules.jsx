@@ -24,6 +24,7 @@ import axios from 'axios';
 const Schedules = () => {
   // State for schedules, loading, and error messaging
   const [schedules, setSchedules] = useState([]);
+  const [filteredSchedules, setFilteredSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchOrderId, setSearchOrderId] = useState('');
@@ -40,17 +41,19 @@ const Schedules = () => {
     try {
       const response = await axios.get('https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule');
       setSchedules(response.data);
+      setFilteredSchedules(response.data); // Initially, show all schedules
     } catch (err) {
       console.error('Error fetching schedules:', err);
       setError('Failed to fetch schedules.');
       setSchedules([]);
+      setFilteredSchedules([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to fetch schedules for a specific order ID using the third-party endpoint
-  const fetchSchedulesByOrder = async () => {
+  // Function to filter schedules based on orderNumber
+  const handleSearch = () => {
     if (!searchOrderId.trim()) {
       setError('Please enter a valid Order ID.');
       return;
@@ -81,7 +84,7 @@ const Schedules = () => {
   const handleResetSearch = () => {
     setSearchOrderId('');
     setError('');
-    fetchAllSchedules();
+    setFilteredSchedules(schedules); // Reset to show all schedules
   };
 
   return (
@@ -118,13 +121,13 @@ const Schedules = () => {
               }}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
-                  fetchSchedulesByOrder();
+                  handleSearch();
                 }
               }}
             />
           </Grid>
           <Grid item xs={6} md={2}>
-            <Button variant="contained" fullWidth onClick={fetchSchedulesByOrder} disabled={loading}>
+            <Button variant="contained" fullWidth onClick={handleSearch} disabled={loading}>
               Search
             </Button>
           </Grid>
@@ -166,14 +169,14 @@ const Schedules = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {schedules.length === 0 ? (
+                  {filteredSchedules.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} align="center">
                         No schedules found.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    schedules.map((schedule, index) => (
+                    filteredSchedules.map((schedule, index) => (
                       <TableRow key={index}>
                         <TableCell>{schedule.orderNumber || 'N/A'}</TableCell>
                         <TableCell>{schedule.stageName || 'N/A'}</TableCell>

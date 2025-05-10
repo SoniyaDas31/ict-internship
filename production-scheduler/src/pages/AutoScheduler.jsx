@@ -9,6 +9,7 @@ import {
   ListItemText,
   Divider,
   Alert,
+  Stack,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -19,7 +20,9 @@ const AutoScheduler = () => {
   const handleAutoSchedule = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('https://production-scheduler-backend-7qgb.onrender.com/scheduling/auto-schedule');
+      const response = await axios.post(
+        'https://production-scheduler-backend-7qgb.onrender.com/scheduling/auto-schedule'
+      );
       console.log('API Response:', response.data);
       setRecommendations(response.data.recommendations);
     } catch (error) {
@@ -29,10 +32,27 @@ const AutoScheduler = () => {
     }
   };
 
+  // Action Handlers
+  const handleOutsource = (rec) => {
+    alert(`Outsource selected for:\n${rec.reason}`);
+  };
+
+  const handleExtraShift = (rec) => {
+    alert(`Extra Shift selected for:\n${rec.reason}`);
+  };
+
+  const handleReschedule = (rec) => {
+    alert(`Reschedule selected for:\n${rec.reason}`);
+  };
+
+  const handleManualApproval = (rec) => {
+    alert(`Manual Approval selected for:\n${rec.reason}`);
+  };
+
   return (
-    <div style={{background: '#ffffff'}}>
-      <Box sx={{ padding: 2, background:  '#ffffff' }}>
-        <Typography variant="h5" gutterBottom sx={{color:'#000'}}>
+    <div style={{ background: '#ffffff' }}>
+      <Box sx={{ padding: 2 }}>
+        <Typography variant="h5" gutterBottom sx={{ color: '#000' }}>
           Auto Scheduler
         </Typography>
 
@@ -54,15 +74,61 @@ const AutoScheduler = () => {
             <List>
               {recommendations.map((rec, index) => (
                 <React.Fragment key={index}>
-                  <ListItem alignItems="flex-start">
+                  <ListItem alignItems="flex-start" sx={{ flexDirection: 'column', alignItems: 'stretch' }}>
                     <ListItemText
                       primary={
-                        <Typography color={rec.type === 'Outsource' ? 'error' : 'warning.main'}>
+                        <Typography
+                          sx={{ fontWeight: 'bold' }}
+                          color={rec.type === 'Outsource' ? 'error' : 'warning.main'}
+                        >
                           {rec.type}
                         </Typography>
                       }
-                      secondary={rec.reason}
+                      secondary={
+                        <>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Reason:</strong> {rec.reason}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Suggested By:</strong> {rec.suggestedBy}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>Created At:</strong>{' '}
+                            {new Date(rec.createdAt).toLocaleString()}
+                          </Typography>
+                        </>
+                      }
                     />
+                    <Stack direction="row" spacing={2} mt={1}>
+                      <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={() => handleManualApproval(rec)}
+                      >
+                        Manual Approval
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleOutsource(rec)}
+                      >
+                        Outsource
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="warning"
+                        onClick={() => handleExtraShift(rec)}
+                      >
+                        Extra Shift
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleReschedule(rec)}
+                      >
+                        Reschedule
+                      </Button>
+                    </Stack>
                   </ListItem>
                   <Divider />
                 </React.Fragment>
