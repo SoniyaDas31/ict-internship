@@ -58,25 +58,15 @@ const Schedules = () => {
       setError('Please enter a valid Order ID.');
       return;
     }
-    setLoading(true);
-    setError('');
-    try {
-      // Calling the route that returns schedules for a particular order
-      const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
-      if (response.data.schedules) {
-        
-         console.log('Schedules:', response.data.schedules); // Debugging line
-        setSchedules(response.data.schedules);
-      } else {
-        setSchedules([]);
-        setError('No schedules found for that Order ID.');
-      }
-    } catch (err) {
-      console.error('Error fetching schedule by order ID:', err);
-      setError('Failed to fetch schedule for that order.');
-      setSchedules([]);
-    } finally {
-      setLoading(false);
+
+    // Filter schedules by orderNumber
+    const filtered = schedules.filter(schedule => schedule.orderNumber && schedule.orderNumber.includes(searchOrderId));
+    setFilteredSchedules(filtered);
+
+    if (filtered.length === 0) {
+      setError('No schedules found for that Order ID.');
+    } else {
+      setError('');
     }
   };
 
@@ -89,7 +79,7 @@ const Schedules = () => {
 
   return (
     <Container>
-      <Box sx={{ my: 4,  bgcolor: 'rgba(255,255,255,0.95)', px:5, py:5 }}>
+      <Box sx={{ my: 4 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -165,6 +155,7 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
+                    {/* <TableCell>Batch #</TableCell> */}
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
@@ -183,8 +174,8 @@ const Schedules = () => {
                         <TableCell>{schedule.machineName || 'N/A'}</TableCell>
                         <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
                         <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
-                        <TableCell>{schedule.status}</TableCell>
-                        <TableCell>{schedule.quantity}</TableCell>
+                        <TableCell>{schedule.status || 'N/A'}</TableCell>
+                        <TableCell>{schedule.quantity || 'N/A'}</TableCell>
                       </TableRow>
                     ))
                   )}
