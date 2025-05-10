@@ -53,7 +53,7 @@ const Schedules = () => {
   };
 
   // Function to filter schedules based on orderNumber
-  const handleSearch = () => {
+  const handleSearch = async () => {  // Added async keyword here
     if (!searchOrderId.trim()) {
       setError('Please enter a valid Order ID.');
       return;
@@ -61,11 +61,9 @@ const Schedules = () => {
     setLoading(true);
     setError('');
     try {
-      // Calling the route that returns schedules for a particular order
       const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
       if (response.data.schedules) {
-        
-         console.log('Schedules:', response.data.schedules); // Debugging line
+        console.log('Schedules:', response.data.schedules);
         setSchedules(response.data.schedules);
       } else {
         setSchedules([]);
@@ -89,7 +87,7 @@ const Schedules = () => {
 
   return (
     <Container>
-      <Box sx={{ my: 4,  bgcolor: 'rgba(255,255,255,0.95)', px:5, py:5 }}>
+      <Box sx={{ p:2, bgcolor: 'rgba(255,255,255,0.95)', margin: '5% auto' }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -158,7 +156,6 @@ const Schedules = () => {
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    {/* Added Order ID as a column */}
                     <TableCell>Order ID</TableCell>
                     <TableCell>Stage Name</TableCell>
                     <TableCell>Machine ID</TableCell>
@@ -199,3 +196,28 @@ const Schedules = () => {
 };
 
 export default Schedules;
+
+// Add async keyword to the function
+const fetchSchedulesByOrder = async () => {
+  if (!searchOrderId.trim()) {
+    setError('Please enter a valid Order ID.');
+    return;
+  }
+  setLoading(true);
+  setError('');
+  try {
+    const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
+    if (response.data.schedules) {
+      setSchedules(response.data.schedules);
+    } else {
+      setSchedules([]);
+      setError('No schedules found for that Order ID.');
+    }
+  } catch (err) {
+    console.error('Error fetching schedule by order ID:', err);
+    setError('Failed to fetch schedule for that order.');
+    setSchedules([]);
+  } finally {
+    setLoading(false);
+  }
+};
