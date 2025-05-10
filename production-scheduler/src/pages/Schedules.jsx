@@ -162,6 +162,7 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
+                    {/* <TableCell>Batch #</TableCell> */}
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
@@ -180,8 +181,8 @@ const Schedules = () => {
                         <TableCell>{schedule.machineName || 'N/A'}</TableCell>
                         <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
                         <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
-                        <TableCell>{schedule.status}</TableCell>
-                        <TableCell>{schedule.quantity}</TableCell>
+                        <TableCell>{schedule.status || 'N/A'}</TableCell>
+                        <TableCell>{schedule.quantity || 'N/A'}</TableCell>
                       </TableRow>
                     ))
                   )}

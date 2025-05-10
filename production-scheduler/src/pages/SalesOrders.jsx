@@ -42,7 +42,7 @@ const SalesOrders = () => {
     deliveryDate: '',
     priority: '',
     isNonChangeable: '',
-    status: 'Pending'
+    status: 'Pending',
   });
 
   const fetchOrders = async () => {
@@ -63,9 +63,9 @@ const SalesOrders = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -76,10 +76,16 @@ const SalesOrders = () => {
         ? `https://kera-internship.onrender.com/order/edit/${editingId}`
         : 'https://kera-internship.onrender.com/order/add';
 
+      // Convert isNonChangeable to boolean
+      const bodyData = {
+        ...formData,
+        isNonChangeable: formData.isNonChangeable === 'true',
+      };
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(bodyData),
       });
 
       if (!response.ok) {
@@ -97,7 +103,7 @@ const SalesOrders = () => {
         deliveryDate: '',
         priority: '',
         isNonChangeable: '',
-        status: ''
+        status: 'Pending',
       });
       setEditingId(null);
       setOpen(false);
@@ -116,14 +122,14 @@ const SalesOrders = () => {
       orderDate: order.orderDate?.slice(0, 10) || '',
       deliveryDate: order.deliveryDate?.slice(0, 10) || '',
       priority: order.priority,
-      isNonChangeable: order.isNonChangeable,
-      status: order.status
+      isNonChangeable: order.isNonChangeable?.toString() || '',
+      status: order.status,
     });
     setEditingId(order._id);
     setOpen(true);
   };
 
-  const filteredOrders = orders.filter(order =>
+  const filteredOrders = orders.filter((order) =>
     order.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.customer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.item?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -131,22 +137,39 @@ const SalesOrders = () => {
   );
 
   return (
-    <Box sx={{ flexGrow: 1, pt: 2, pb: 5, bgcolor: 'rgba(255,255,255,0.95)', width: '90%', margin: '5% auto' }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        pt: 2,
+        pb: 5,
+        bgcolor: 'rgba(255,255,255,0.95)',
+        width: '90%',
+        margin: '5% auto',
+      }}
+    >
       <Container maxWidth={false}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4">Orders</Typography>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setEditingId(null); setFormData({
-            orderId: '',
-            customer: '',
-            item: '',
-            quantity: '',
-            rate: '',
-            orderDate: '',
-            deliveryDate: '',
-            priority: '',
-            isNonChangeable: '',
-            status: ''
-          }); setOpen(true); }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setEditingId(null);
+              setFormData({
+                orderId: '',
+                customer: '',
+                item: '',
+                quantity: '',
+                rate: '',
+                orderDate: '',
+                deliveryDate: '',
+                priority: '',
+                isNonChangeable: '',
+                status: 'Pending',
+              });
+              setOpen(true);
+            }}
+          >
             New Order
           </Button>
         </Box>
@@ -189,7 +212,7 @@ const SalesOrders = () => {
                   <TableCell colSpan={11} align="center">No orders found</TableCell>
                 </TableRow>
               ) : (
-                filteredOrders.map(order => (
+                filteredOrders.map((order) => (
                   <TableRow key={order._id}>
                     <TableCell>{order.orderId}</TableCell>
                     <TableCell>{order.customer}</TableCell>
@@ -200,7 +223,7 @@ const SalesOrders = () => {
                     <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
                     <TableCell>{order.priority}</TableCell>
                     <TableCell>{order.status}</TableCell>
-                    <TableCell>{order.isNonChangeable}</TableCell>
+                    <TableCell>{order.isNonChangeable ? 'Yes' : 'No'}</TableCell>
                     <TableCell>
                       <IconButton color="primary" size="small" onClick={() => handleEdit(order)}>
                         <EditIcon />
@@ -226,7 +249,21 @@ const SalesOrders = () => {
               <TextField name="deliveryDate" label="Delivery Date" type="date" value={formData.deliveryDate} onChange={handleInputChange} InputLabelProps={{ shrink: true }} required />
               <TextField name="priority" label="Priority" type="number" value={formData.priority} onChange={handleInputChange} required />
               <TextField name="status" label="Status" value={formData.status} onChange={handleInputChange} required />
-              <TextField name="isNonChangeable" label="Non-Changeable" value={formData.isNonChangeable} onChange={handleInputChange} required />
+
+              {/* Updated isNonChangeable field */}
+              <TextField
+                name="isNonChangeable"
+                select
+                label="Non-Changeable"
+                value={formData.isNonChangeable}
+                onChange={handleInputChange}
+                SelectProps={{ native: true }}
+                required
+              >
+                <option value="">Select</option>
+                <option value="true">True</option>
+                <option value="false">False</option>
+              </TextField>
             </Stack>
           </DialogContent>
           <DialogActions>

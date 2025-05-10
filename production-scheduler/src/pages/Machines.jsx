@@ -247,9 +247,10 @@ const Machines = () => {
                   <TableRow key={machine._id}>
                     <TableCell>{machine.machineId}</TableCell>
                     <TableCell>{machine.process}</TableCell>
-                    <TableCell>{machine.unit_material_per_product}</TableCell>
                     <TableCell>{machine.batch_size}</TableCell>
-                    <TableCell>{machine.time_per_product}</TableCell>
+                    <TableCell>
+                      <Chip label={machine.status} color={machine.status === 'Active' ? 'success' : 'warning'} />
+                    </TableCell>
                     <TableCell>
                       <IconButton color="primary" size="small" onClick={() => handleEdit(machine)}>
                         <EditIcon />
