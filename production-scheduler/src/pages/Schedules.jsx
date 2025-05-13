@@ -16,32 +16,28 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Divider,
 } from '@mui/material';
 import { Search as SearchIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import axios from 'axios';
 
 const Schedules = () => {
-  // State for schedules, loading, and error messaging
   const [schedules, setSchedules] = useState([]);
   const [filteredSchedules, setFilteredSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchOrderId, setSearchOrderId] = useState('');
 
-  // On mount, fetch all schedules
   useEffect(() => {
     fetchAllSchedules();
   }, []);
 
-  // Function to fetch all schedules from internal schedule API
   const fetchAllSchedules = async () => {
     setLoading(true);
     setError('');
     try {
       const response = await axios.get('https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule');
       setSchedules(response.data);
-      setFilteredSchedules(response.data); // Initially, show all schedules
+      setFilteredSchedules(response.data);
     } catch (err) {
       console.error('Error fetching schedules:', err);
       setError('Failed to fetch schedules.');
@@ -52,42 +48,34 @@ const Schedules = () => {
     }
   };
 
-  // Function to filter schedules based on orderNumber
-  const handleSearch = async () => {  // Added async keyword here
+  const handleSearch = () => {
     if (!searchOrderId.trim()) {
       setError('Please enter a valid Order ID.');
       return;
     }
-    setLoading(true);
-    setError('');
-    try {
-      const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
-      if (response.data.schedules) {
-        console.log('Schedules:', response.data.schedules);
-        setSchedules(response.data.schedules);
-      } else {
-        setSchedules([]);
-        setError('No schedules found for that Order ID.');
-      }
-    } catch (err) {
-      console.error('Error fetching schedule by order ID:', err);
-      setError('Failed to fetch schedule for that order.');
-      setSchedules([]);
-    } finally {
-      setLoading(false);
+
+    const filtered = schedules.filter(schedule =>
+      schedule.orderNumber?.toLowerCase().includes(searchOrderId.trim().toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+      setError('No schedules found for that Order ID.');
+    } else {
+      setError('');
     }
+
+    setFilteredSchedules(filtered);
   };
 
-  // Handler for when the search input is empty
   const handleResetSearch = () => {
     setSearchOrderId('');
     setError('');
-    setFilteredSchedules(schedules); // Reset to show all schedules
+    setFilteredSchedules(schedules);
   };
 
   return (
     <Container>
-      <Box sx={{ p:2, bgcolor: 'rgba(255,255,255,0.95)', margin: '5% auto' }}>
+      <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.95)', margin: '5% auto' }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ color: '#1a1a1a' }}>
@@ -111,7 +99,6 @@ const Schedules = () => {
                   </InputAdornment>
                 ),
               }}
-              // Set background color of the TextField to white
               sx={{
                 '& .MuiInputBase-root': {
                   backgroundColor: 'white',
@@ -162,14 +149,13 @@ const Schedules = () => {
                     <TableCell>Scheduled Start</TableCell>
                     <TableCell>Scheduled End</TableCell>
                     <TableCell>Status</TableCell>
-                    {/* <TableCell>Batch #</TableCell> */}
                     <TableCell>Quantity</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredSchedules.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} align="center">
+                      <TableCell colSpan={7} align="center">
                         No schedules found.
                       </TableCell>
                     </TableRow>
@@ -197,28 +183,3 @@ const Schedules = () => {
 };
 
 export default Schedules;
-
-// Add async keyword to the function
-const fetchSchedulesByOrder = async () => {
-  if (!searchOrderId.trim()) {
-    setError('Please enter a valid Order ID.');
-    return;
-  }
-  setLoading(true);
-  setError('');
-  try {
-    const response = await axios.get(`https://production-scheduler-backend-7qgb.onrender.com/scheduling/schedule/${searchOrderId}`);
-    if (response.data.schedules) {
-      setSchedules(response.data.schedules);
-    } else {
-      setSchedules([]);
-      setError('No schedules found for that Order ID.');
-    }
-  } catch (err) {
-    console.error('Error fetching schedule by order ID:', err);
-    setError('Failed to fetch schedule for that order.');
-    setSchedules([]);
-  } finally {
-    setLoading(false);
-  }
-};
