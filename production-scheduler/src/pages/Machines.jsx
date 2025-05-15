@@ -64,7 +64,7 @@ const Machines = () => {
   const handleSubmit = async () => {
     try {
       const url = editingId
-        ? `https://kera-internship.onrender.com/schedule/${editingId}`
+        ? `https://kera-internship.onrender.com/schedule/edit/${editingId}`
         : 'https://kera-internship.onrender.com/schedule';
       const method = editingId ? 'PUT' : 'POST';
 
