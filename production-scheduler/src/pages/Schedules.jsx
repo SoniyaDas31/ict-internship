@@ -16,8 +16,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
-import { Search as SearchIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import {
+  Search as SearchIcon,
+  Refresh as RefreshIcon,
+  ExpandMore as ExpandMoreIcon,
+} from '@mui/icons-material';
 import axios from 'axios';
 
 const Schedules = () => {
@@ -99,11 +106,7 @@ const Schedules = () => {
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                '& .MuiInputBase-root': {
-                  backgroundColor: 'white',
-                },
-              }}
+              sx={{ '& .MuiInputBase-root': { backgroundColor: 'white' } }}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   handleSearch();
@@ -130,14 +133,11 @@ const Schedules = () => {
         </Grid>
 
         {/* Loading Indicator */}
-        {loading && (
+        {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
             <CircularProgress />
           </Box>
-        )}
-
-        {/* Schedule Table */}
-        {!loading && (
+        ) : (
           <Paper>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader>
@@ -146,8 +146,8 @@ const Schedules = () => {
                     <TableCell>Order ID</TableCell>
                     <TableCell>Stage Name</TableCell>
                     <TableCell>Machine ID</TableCell>
-                    <TableCell>Scheduled Start</TableCell>
-                    <TableCell>Scheduled End</TableCell>
+                    <TableCell>Scheduled Start(utc)</TableCell>
+                    <TableCell>Scheduled End(utc)</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Quantity</TableCell>
                   </TableRow>
@@ -161,15 +161,49 @@ const Schedules = () => {
                     </TableRow>
                   ) : (
                     filteredSchedules.map((schedule, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{schedule.orderNumber || 'N/A'}</TableCell>
-                        <TableCell>{schedule.stageName || 'N/A'}</TableCell>
-                        <TableCell>{schedule.machineName || 'N/A'}</TableCell>
-                        <TableCell>{new Date(schedule.scheduledStart).toLocaleString()}</TableCell>
-                        <TableCell>{new Date(schedule.scheduledEnd).toLocaleString()}</TableCell>
-                        <TableCell>{schedule.status || 'N/A'}</TableCell>
-                        <TableCell>{schedule.quantity || 'N/A'}</TableCell>
-                      </TableRow>
+                      <React.Fragment key={index}>
+                        <TableRow>
+                          <TableCell>{schedule.orderNumber || 'N/A'}</TableCell>
+                          <TableCell>{schedule.stageName || 'N/A'}</TableCell>
+                          <TableCell>{schedule.machineName || 'N/A'}</TableCell>
+                          <TableCell>{new Date(schedule.scheduledStart).toUTCString()}</TableCell>
+                          <TableCell>{new Date(schedule.scheduledEnd).toUTCString()}</TableCell>
+                          <TableCell>{schedule.status || 'N/A'}</TableCell>
+                          <TableCell>{schedule.quantity || 'N/A'}</TableCell>
+                        </TableRow>
+
+                        {schedule.scheduleChunks && schedule.scheduleChunks.length > 0 && (
+                          <TableRow>
+                            <TableCell colSpan={7} sx={{ padding: 0 }}>
+                              <Accordion>
+                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                  <Typography variant="subtitle2">View Chunks</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                  <Table size="small">
+                                    <TableHead>
+                                      <TableRow>
+                                        <TableCell>Chunk Start(utc) </TableCell>
+                                        <TableCell>Chunk End(utc) </TableCell>
+                                        <TableCell>Chunk Quantity</TableCell>
+                                      </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                      {schedule.scheduleChunks.map((chunk, idx) => (
+                                        <TableRow key={idx}>
+                                          <TableCell>{new Date(chunk.startTime).toUTCString()}</TableCell>
+                                          <TableCell>{new Date(chunk.endTime).toUTCString()}</TableCell>
+                                          <TableCell>{chunk.quantity}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </AccordionDetails>
+                              </Accordion>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     ))
                   )}
                 </TableBody>

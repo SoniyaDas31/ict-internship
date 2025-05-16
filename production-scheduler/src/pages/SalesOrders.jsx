@@ -219,8 +219,8 @@ const SalesOrders = () => {
                     <TableCell>{order.item}</TableCell>
                     <TableCell>{order.quantity}</TableCell>
                     <TableCell>{order.rate}</TableCell>
-                    <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(order.deliveryDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(order.orderDate).toUTCString()}</TableCell>
+                    <TableCell>{new Date(order.deliveryDate).toUTCString()}</TableCell>
                     <TableCell>{order.priority}</TableCell>
                     <TableCell>{order.status}</TableCell>
                     <TableCell>{order.isNonChangeable ? 'Yes' : 'No'}</TableCell>

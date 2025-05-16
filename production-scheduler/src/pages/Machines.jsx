@@ -216,7 +216,7 @@ const Machines = () => {
               <MenuItem value="">All</MenuItem>
               <MenuItem value="Active">Active</MenuItem>
               <MenuItem value="Maintenance">Maintenance</MenuItem>
-              <MenuItem value="Offline">Idle</MenuItem>
+              <MenuItem value="Idle">Idle</MenuItem>
             </Select>
           </FormControl>
         </Stack>
@@ -347,7 +347,7 @@ const Machines = () => {
                 >
                   <MenuItem value="Active">Active</MenuItem>
                   <MenuItem value="Maintenance">Maintenance</MenuItem>
-                  <MenuItem value="Offline">Idle</MenuItem>
+                  <MenuItem value="Idle">Idle</MenuItem>
                 </Select>
               </FormControl>
             </Stack>
