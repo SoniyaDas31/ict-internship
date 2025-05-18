@@ -33,6 +33,8 @@ const Schedules = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchOrderId, setSearchOrderId] = useState('');
+  const [searchStageName, setSearchStageName] = useState('');
+  const [searchMachineId, setSearchMachineId] = useState('');
 
   useEffect(() => {
     fetchAllSchedules();
@@ -56,30 +58,42 @@ const Schedules = () => {
   };
 
   const handleSearch = () => {
-    if (!searchOrderId.trim()) {
-      setError('Please enter a valid Order ID.');
+    if (!searchOrderId && !searchStageName && !searchMachineId) {
+      setError('Please enter at least one search term.');
       return;
     }
-
-    const filtered = schedules.filter(schedule =>
-      schedule.orderNumber?.toLowerCase().includes(searchOrderId.trim().toLowerCase())
-    );
-
+  
+    const filtered = schedules.filter(schedule => {
+      const matchOrderId = searchOrderId
+        ? schedule.orderNumber?.toLowerCase().includes(searchOrderId.trim().toLowerCase())
+        : true;
+  
+      const matchStageName = searchStageName
+        ? schedule.stageName?.toLowerCase().includes(searchStageName.trim().toLowerCase())
+        : true;
+  
+      const matchMachineId = searchMachineId
+        ? schedule.machineName?.toLowerCase().includes(searchMachineId.trim().toLowerCase())
+        : true;
+  
+      return matchOrderId && matchStageName && matchMachineId;
+    });
+  
     if (filtered.length === 0) {
-      setError('No schedules found for that Order ID.');
+      setError('No schedules found matching your criteria.');
     } else {
       setError('');
     }
-
+  
     setFilteredSchedules(filtered);
   };
-
   const handleResetSearch = () => {
     setSearchOrderId('');
-    setError('');
+    setSearchStageName('');
+    setSearchMachineId('');
     setFilteredSchedules(schedules);
+    setError('');
   };
-
   return (
     <Container>
       <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.95)', margin: '5% auto' }}>
@@ -114,6 +128,44 @@ const Schedules = () => {
               }}
             />
           </Grid>
+          <Grid item xs={12} md={4}>
+    <TextField
+      fullWidth
+      variant="outlined"
+      placeholder="Search by Stage Name..."
+      value={searchStageName}
+      onChange={(e) => setSearchStageName(e.target.value)}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon />
+          </InputAdornment>
+        ),
+      }}
+      sx={{ '& .MuiInputBase-root': { backgroundColor: 'white' } }}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') handleSearch();
+      }}
+    />
+  </Grid>
+  <Grid item xs={12} md={4}>
+    <TextField
+      fullWidth
+      variant="outlined"
+      placeholder="Search by Machine ID..."
+      value={searchMachineId}
+      onChange={(e) => setSearchMachineId(e.target.value)}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon />
+          </InputAdornment>
+        ),
+      }}
+      sx={{ '& .MuiInputBase-root': { backgroundColor: 'white' } }}
+    />
+  </Grid>
+
           <Grid item xs={6} md={2}>
             <Button variant="contained" fullWidth onClick={handleSearch} disabled={loading}>
               Search
